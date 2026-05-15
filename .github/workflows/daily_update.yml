@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 openai
+          pip install requests beautifulsoup4 openai lxml
 
       - name: Run Scraper
         env:
