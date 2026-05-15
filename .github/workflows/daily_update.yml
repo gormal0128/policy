@@ -2,8 +2,8 @@ name: Daily Policy Update
 
 on:
   schedule:
-    - cron: '0 23 * * *' # 매일 한국 시간 오전 8시 (UTC 23:00) 실행
-  workflow_dispatch:      # 수동으로 실행하고 싶을 때 버튼 생성
+    - cron: '0 23 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,4 +32,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add policy_db.json index.html
           git commit -m "Update Dashboard: $(date)" || echo "No changes to commit"
-          git push -f
+          git push
