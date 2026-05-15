@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,10 +26,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python policy_scraper.py
 
-      - name: Commit and Push changes
-        run: |
-          git config --global user.name "Auto-Updater"
-          git config --global user.email "actions@github.com"
-          git add policy_db.json index.html
-          git commit -m "Update Dashboard: $(date)" || echo "No changes to commit"
-          git push
+      # 복잡한 git 명령어들을 전부 지우고, 똑똑한 '자동 커밋 도구'로 교체했습니다!
+      - name: Auto Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update Dashboard"
