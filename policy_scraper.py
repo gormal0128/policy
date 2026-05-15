@@ -19,7 +19,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 # 누적 데이터를 저장할 파일명
 DB_FILE = "policy_db.json"
 # 최종 생성될 HTML 대시보드 파일명
-HTML_FILE = "PolicyTracker_Dashboard.html"
+HTML_FILE = "index.html"
 
 # ==========================================
 # 2. 데이터베이스(JSON) 관리 함수
