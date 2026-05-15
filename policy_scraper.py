@@ -129,18 +129,21 @@ def update_dashboard():
     generate_html_dashboard(db)
 
 # ==========================================
-# 5. HTML 목록형 대시보드 렌더링
+# 5. HTML 목록형 대시보드 렌더링 (새 창 열기 버전)
 # ==========================================
 def generate_html_dashboard(db_data):
     rows_html = ""
+    hidden_contents = "" # 새 창에 띄울 본문 데이터를 숨겨둘 변수
+    
     for idx, item in enumerate(db_data):
         # 줄바꿈 처리
         sum_ko = item['summary_ko'].replace('\n', '<br>')
         txt_en = item['full_text_en'].replace('\n', '<br><br>')
         txt_ko = item['full_text_ko'].replace('\n', '<br><br>')
         
+        # 1. 목록 행 (클릭 시 openNewWindow 함수 실행)
         rows_html += f"""
-        <tr class="item-row" onclick="toggleDetails('detail-{idx}')">
+        <tr class="item-row" onclick="openNewWindow('article-{idx}')">
             <td class="col-date">{item['date'][:16]}</td>
             <td class="col-title">
                 <strong>{item['title_ko']}</strong><br>
@@ -148,20 +151,27 @@ def generate_html_dashboard(db_data):
             </td>
             <td class="col-summary">{sum_ko}</td>
         </tr>
-        <tr id="detail-{idx}" class="detail-row" style="display: none;">
-            <td colspan="3">
-                <div class="content-wrapper">
-                    <div class="content-box">
-                        <div class="box-label ko-label">🇰🇷 한국어 번역 본문</div>
-                        {txt_ko}
-                    </div>
-                    <div class="content-box">
-                        <div class="box-label en-label">🇬🇧 영문 원본 본문</div>
-                        {txt_en}
-                    </div>
+        """
+        
+        # 2. 새 창에 띄울 내용 (화면에는 보이지 않게 display:none 으로 숨겨둠)
+        # 새 창에서도 예쁘게 보이도록 인라인 스타일(style)을 적용했습니다.
+        hidden_contents += f"""
+        <div id="article-{idx}" style="display: none;">
+            <div style="max-width: 900px; margin: 0 auto; font-family: 'Malgun Gothic', sans-serif; color: #333; line-height: 1.7;">
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; line-height: 1.4;">{item['title_ko']}</h2>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px;">발행일: {item['date']}</p>
+                
+                <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 30px;">
+                    <span style="background-color: #2980b9; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">🇰🇷 한국어 번역 본문</span>
+                    <div style="margin-top: 15px; font-size: 1.05em; color: #1a202c;">{txt_ko}</div>
                 </div>
-            </td>
-        </tr>
+                
+                <div style="background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="background-color: #7f8c8d; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">🇬🇧 영문 원본 본문</span>
+                    <div style="margin-top: 15px; font-size: 0.95em; color: #4a5568;">{txt_en}</div>
+                </div>
+            </div>
+        </div>
         """
 
     html_template = f"""
@@ -184,28 +194,19 @@ def generate_html_dashboard(db_data):
             
             .en-title {{ font-size: 0.85em; color: #95a5a6; display: block; margin-top: 5px; }}
             
-            /* 목록 호버 및 클릭 액션 */
+            /* 목록 호버 시 클릭할 수 있다는 시각적 효과 부여 */
             .item-row {{ cursor: pointer; transition: background 0.2s; }}
-            .item-row:hover {{ background-color: #f8fafc; }}
-            
-            /* 세부 본문 영역 */
-            .detail-row {{ background-color: #f1f5f9; }}
-            .content-wrapper {{ display: flex; gap: 20px; padding: 10px; }}
-            .content-box {{ flex: 1; background: white; padding: 25px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95em; line-height: 1.7; }}
-            
-            .box-label {{ display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.85em; margin-bottom: 15px; color: white; }}
-            .ko-label {{ background-color: #2980b9; }}
-            .en-label {{ background-color: #7f8c8d; }}
+            .item-row:hover {{ background-color: #e2e8f0; }}
+            .item-row:hover .col-title strong {{ color: #2980b9; text-decoration: underline; }}
         </style>
         <script>
-            // 클릭 시 세부 내용을 열고 닫는 자바스크립트 함수
-            function toggleDetails(rowId) {{
-                var row = document.getElementById(rowId);
-                if (row.style.display === "none") {{
-                    row.style.display = "table-row";
-                }} else {{
-                    row.style.display = "none";
-                }}
+            // 클릭 시 새 창(새 탭)을 열고 숨겨둔 본문을 그려주는 마법의 함수
+            function openNewWindow(articleId) {{
+                var content = document.getElementById(articleId).innerHTML;
+                var newWin = window.open('', '_blank');
+                newWin.document.open();
+                newWin.document.write('<html><head><title>기사 상세 본문</title></head><body style="background-color: #f4f6f9; padding: 40px;">' + content + '</body></html>');
+                newWin.document.close();
             }}
         </script>
     </head>
@@ -216,7 +217,7 @@ def generate_html_dashboard(db_data):
                 <thead>
                     <tr>
                         <th class="col-date">발행일</th>
-                        <th class="col-title">기사 제목 (클릭하여 본문 보기)</th>
+                        <th class="col-title">기사 제목 (클릭하면 새 창에서 열립니다)</th>
                         <th class="col-summary">핵심 요약</th>
                     </tr>
                 </thead>
@@ -225,13 +226,17 @@ def generate_html_dashboard(db_data):
                 </tbody>
             </table>
         </div>
+        
+        <div id="hidden-data">
+            {hidden_contents}
+        </div>
     </body>
     </html>
     """
     
     with open(HTML_FILE, "w", encoding="utf-8") as f:
         f.write(html_template)
-    print(f"✅ 대시보드 업데이트 완료! '{HTML_FILE}' 파일을 열어보세요.")
+    print(f"✅ 대시보드 업데이트 완료! '{HTML_FILE}' 파일이 생성되었습니다.")
 
 if __name__ == "__main__":
     update_dashboard()
