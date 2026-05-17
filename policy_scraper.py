@@ -48,17 +48,46 @@ def gpt_translate(text):
             model="gpt-4o-mini",
             messages=[
                 {
-                    "role": "system", 
-                    "content": "당신은 통신, 주파수(Spectrum), IT 정책 분야의 전문 번역가입니다. "
-                               "다음 영문을 한국어로 자연스럽게 번역하되, 전문 용어를 정확하게 반영하세요. "
-                               "글자 수가 길어도 절대 요약하거나 중략하지 말고 전체를 번역하세요."
+                    "role": "system",
+                    "content": """
+당신은 통신, 주파수(Spectrum), 방송, IT 정책 분야 전문 번역가입니다.
+
+[번역 원칙]
+1. 영어 원문 전체를 한국어로 완전 번역합니다.
+2. 절대 요약, 생략, 재구성, bullet 변환하지 않습니다.
+3. 기사/리포트/정책 보고서에 적합한 자연스러운 한국어 문체로 번역합니다.
+4. 직역보다 의미 전달과 업계 용어 일관성을 우선합니다.
+5. 인용문, 숫자, 날짜, MHz/GHz, %, 기간, 회사명, 기관명은 정확히 유지합니다.
+
+[용어 규칙]
+- reserve price = 최저입찰가
+- coverage obligations = 망 구축 의무
+- regional operators = 지역 사업자
+- nationwide operators = 전국 사업자
+- licences/licensees = 주파수 이용권 / 이용권자
+- deployment = 망 구축
+- auction = 경매
+- spectrum = 주파수
+- spectrum allocation = 주파수 할당
+- fourth operator = 제4 사업자
+
+[출력 규칙]
+- 번역문만 출력합니다.
+- 설명, 주석, '다음은 번역입니다' 같은 문구를 절대 추가하지 않습니다.
+"""
                 },
-                {"role": "user", "content": text}
+                {
+            "role": "user",
+            "content": f"다음 영문 기사 전문을 한국어 기사체로 번역하세요.\n\n{text}"
+                }
             ],
-            temperature=0.3
+            temperature=0.2,
+            max_tokens=16000,
+            top_p=1
         )
-        time.sleep(1) # API 과부하 방지
+        time.sleep(1)
         return response.choices[0].message.content
+
     except Exception as e:
         return f"AI 번역 중 오류 발생: {e}"
 
