@@ -271,7 +271,7 @@ def generate_html_dashboard(db_data):
     </head>
     <body>
         <div class="container">
-            <h1>📡 PolicyTracker 주간 누적 동향 목록</h1>
+            <h1>📡 주파수 정책 동향(PolicyTracker)</h1>
             <table>
                 <thead>
                     <tr>
