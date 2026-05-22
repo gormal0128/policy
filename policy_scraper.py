@@ -242,9 +242,9 @@ def generate_html_dashboard(db_data):
             th, td {{ padding: 15px 20px; border-bottom: 1px solid #e2e8f0; text-align: left; }}
             th {{ background-color: #34495e; color: white; font-size: 1.05em; }}
 
-            .col-date {{ width: 15%; font-size: 0.85em; color: #7f8c8d; }}
+            .col-date {{ width: 15%; font-size: 0.85em; }}
             .col-title {{ width: 40%; font-size: 1.05em; }}
-            .col-summary {{ width: 45%; font-size: 0.95em; color: #555; }}
+            .col-summary {{ width: 45%; font-size: 0.95em; }}
 
             .en-title {{ font-size: 0.85em; color: #95a5a6; display: block; margin-top: 5px; }}
 
