@@ -34,28 +34,23 @@ def save_db(data):
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 # ==========================================
-# 3. GPT 번역 함수 (제목·요약·본문 1회 통합 호출 + 재시도)
+# 3. GPT 번역 및 요약 함수 (제목·본문 번역 + 진짜 요약 생성)
 # ==========================================
 def gpt_translate_all(title_en, summary_en, full_text_en, max_retries=3):
     """
-    제목·요약·본문을 한 번의 API 호출로 번역합니다.
-    실패 시 최대 max_retries회 재시도합니다.
-    반환값: {"title_ko": ..., "summary_ko": ..., "full_text_ko": ...}
+    제목과 본문은 번역하고, 요약은 본문을 바탕으로 AI가 직접 생성합니다.
     """
-    prompt = f"""아래 [TITLE], [SUMMARY], [FULL_TEXT] 세 항목을 각각 한국어로 번역하고,
+    prompt = f"""아래 [TITLE]과 [FULL_TEXT]를 바탕으로 지시사항을 수행하고,
 다음 JSON 형식으로만 출력하세요. 설명, 주석, 마크다운 코드블록(```)은 절대 포함하지 마세요.
 
 {{
   "title_ko": "번역된 제목",
-  "summary_ko": "번역된 요약",
-  "full_text_ko": "번역된 본문"
+  "summary_ko": "본문의 핵심 내용을 2~3줄로 직접 요약한 한국어 텍스트",
+  "full_text_ko": "전체 본문 번역본"
 }}
 
 [TITLE]
 {title_en}
-
-[SUMMARY]
-{summary_en}
 
 [FULL_TEXT]
 {full_text_en}"""
@@ -67,14 +62,12 @@ def gpt_translate_all(title_en, summary_en, full_text_en, max_retries=3):
                 messages=[
                     {
                         "role": "system",
-                        "content": """당신은 통신, 주파수(Spectrum), 방송, IT 정책 분야 전문 번역가입니다.
+                        "content": """당신은 통신, 주파수(Spectrum), 방송, IT 정책 분야 전문 번역가이자 요약 전문가입니다.
 
-[번역 원칙]
-1. 영어 원문 전체를 한국어로 완전 번역합니다.
-2. 절대 요약, 생략, 재구성, bullet 변환하지 않습니다.
-3. 기사/리포트/정책 보고서에 적합한 자연스러운 한국어 문체로 번역합니다.
-4. 직역보다 의미 전달과 업계 용어 일관성을 우선합니다.
-5. 인용문, 숫자, 날짜, MHz/GHz, %, 기간, 회사명, 기관명은 정확히 유지합니다.
+[작업 원칙]
+1. title_ko: 영어 원본 제목을 한국어로 자연스럽게 번역합니다.
+2. summary_ko: 영어 본문([FULL_TEXT])을 읽고 가장 중요한 핵심 내용을 2~3문장으로 간결하게 직접 요약(Summarize)하여 한국어로 작성합니다. 기존의 잘려진 짧은 문구가 아닌, 전체 문맥이 파악되는 진짜 요약을 만드세요.
+3. full_text_ko: 영어 원본 본문을 빠짐없이 완전 번역합니다. 절대 생략하거나 재구성하지 않습니다.
 
 [용어 규칙]
 - reserve price = 최저입찰가
@@ -97,7 +90,7 @@ def gpt_translate_all(title_en, summary_en, full_text_en, max_retries=3):
                         "content": prompt
                     }
                 ],
-                temperature=0.2,
+                temperature=0.3, # 요약을 위해 창의성 살짝 부여
                 max_tokens=16000,
                 top_p=1
             )
@@ -120,7 +113,7 @@ def gpt_translate_all(title_en, summary_en, full_text_en, max_retries=3):
             print(f"  ⏳ {wait}초 후 재시도합니다...")
             time.sleep(wait)
 
-    # 모든 재시도 실패 시 원문 그대로 반환
+    # 모든 재시도 실패 시 원문 그대로 반환 (summary_ko는 기존 원문 요약을 임시로 사용)
     print("  ❌ 번역 최종 실패. 원문을 저장합니다.")
     return {
         "title_ko": title_en,
