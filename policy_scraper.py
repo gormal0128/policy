@@ -194,39 +194,41 @@ def generate_html_dashboard(db_data):
     hidden_contents = ""
 
     for idx, item in enumerate(db_data):
-        sum_ko = item['summary_ko'].replace('\n', '<br>')
-        txt_en = item['full_text_en'].replace('\n', '<br><br>')
-        txt_ko = item['full_text_ko'].replace('\n', '<br><br>')
+        # replace 변환을 제거하고 원본 텍스트를 그대로 사용합니다.
+        sum_ko = item.get('summary_ko', '')
+        txt_en = item.get('full_text_en', '')
+        txt_ko = item.get('full_text_ko', '')
 
         rows_html += f"""
         <tr class="item-row" onclick="openNewWindow('article-{idx}')">
-            <td class="col-date">{item['date'][:16]}</td>
+            <td class="col-date">{item.get('date', '')[:16]}</td>
             <td class="col-title">
-                <strong>{item['title_ko']}</strong><br>
-                <span class="en-title">{item['title_en']}</span>
+                <strong>{item.get('title_ko', '')}</strong><br>
+                <span class="en-title">{item.get('title_en', '')}</span>
             </td>
-            <td class="col-summary">{sum_ko}</td>
+            <td class="col-summary" style="white-space: pre-wrap;">{sum_ko}</td>
         </tr>
         """
 
         hidden_contents += f"""
         <div id="article-{idx}" style="display: none;">
             <div style="max-width: 900px; margin: 0 auto; font-family: 'Malgun Gothic', sans-serif; color: #333; line-height: 1.7;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; line-height: 1.4;">{item['title_ko']}</h2>
-                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px;">발행일: {item['date']}</p>
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; line-height: 1.4;">{item.get('title_ko', '')}</h2>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px;">발행일: {item.get('date', '')}</p>
 
                 <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 30px;">
                     <span style="background-color: #2980b9; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">🇰🇷 한국어 번역 본문</span>
-                    <div style="margin-top: 15px; font-size: 1.05em; color: #1a202c;">{txt_ko}</div>
+                    <div style="margin-top: 15px; font-size: 1.05em; color: #1a202c; white-space: pre-wrap;">{txt_ko}</div>
                 </div>
 
                 <div style="background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0;">
                     <span style="background-color: #7f8c8d; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">🇬🇧 영문 원본 본문</span>
-                    <div style="margin-top: 15px; font-size: 0.95em; color: #4a5568;">{txt_en}</div>
+                    <div style="margin-top: 15px; font-size: 0.95em; color: #4a5568; white-space: pre-wrap;">{txt_en}</div>
                 </div>
             </div>
         </div>
         """
+        
 
     html_template = f"""
     <html>
