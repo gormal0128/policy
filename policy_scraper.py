@@ -157,10 +157,10 @@ def update_dashboard():
         date_raw = art.pubDate.text.strip() if art.pubDate else "날짜 없음"
 
         desc_tag = art.description
-        summary_en = BeautifulSoup(desc_tag.text, 'html.parser').text.strip() if desc_tag else "요약 없음"
+        summary_en = BeautifulSoup(desc_tag.text, 'html.parser').get_text(separator='\n', strip=True) if desc_tag else "요약 없음"
 
         content_tag = art.find('content:encoded')
-        full_text_en = BeautifulSoup(content_tag.text, 'html.parser').text.strip() if content_tag else summary_en
+        full_text_en = BeautifulSoup(content_tag.text, 'html.parser').get_text(separator='\n\n', strip=True) if content_tag else summary_en
 
         # ✅ 1회 통합 번역 호출 (기존 3회 → 1회)
         translated = gpt_translate_all(title_en, summary_en, full_text_en)
