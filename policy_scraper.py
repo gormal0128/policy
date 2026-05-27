@@ -66,8 +66,8 @@ def gpt_translate_all(title_en, summary_en, full_text_en, max_retries=3):
 
 [작업 원칙]
 1. title_ko: 영어 원본 제목을 한국어로 자연스럽게 번역합니다.
-2. summary_ko: 영어 본문([FULL_TEXT])을 읽고 가장 중요한 핵심 내용을 2~3문장으로 간결하게 직접 요약(Summarize)하여 한국어로 작성합니다. 기존의 잘려진 짧은 문구가 아닌, 전체 문맥이 파악되는 진짜 요약을 만드세요.
-3. full_text_ko: 영어 원본 본문을 빠짐없이 완전 번역합니다. 절대 생략하거나 재구성하지 않습니다.
+2. summary_ko: 영어 본문([FULL_TEXT])을 읽고 가장 중요한 핵심 내용을 2~3문장으로 간결하게 직접 요약(Summarize)하여 한국어로 작성합니다. 각 문장 끝에는 자연스럽게 줄바꿈(\n)을 넣어주세요.
+3. full_text_ko: 영어 원본 본문을 빠짐없이 완전 번역합니다. 절대 생략하거나 재구성하지 않습니다. 특히, 원본의 문단 구분(줄바꿈 기호 '\n\n')을 그대로 유지하여 가독성 있게 줄바꿈된 형태로 번역 결과를 작성하세요. 통짜 문단으로 합치지 마세요.
 
 [용어 규칙]
 - reserve price = 최저입찰가
@@ -213,8 +213,8 @@ def generate_html_dashboard(db_data):
         hidden_contents += f"""
         <div id="article-{idx}" style="display: none;">
             <div style="max-width: 900px; margin: 0 auto; font-family: 'Malgun Gothic', sans-serif; color: #333; line-height: 1.7;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; line-height: 1.4;">{item.get('title_ko', '')}</h2>
-                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px;">발행일: {item.get('date', '')}</p>
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; line-height: 1.4;">{item['title_ko']}</h2>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px;">발행일: {item['date']}</p>
 
                 <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 30px;">
                     <span style="background-color: #2980b9; color: white; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">🇰🇷 한국어 번역 본문</span>
