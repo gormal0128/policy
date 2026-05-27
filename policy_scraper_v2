@@ -17,7 +17,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 DB_FILE = "policy_db.json"
-HTML_FILE = "index.html"
+HTML_FILE = "index2.html"
 
 # ==========================================
 # 2. 데이터베이스(JSON) 관리 함수
